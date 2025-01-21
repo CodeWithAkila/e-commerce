@@ -1,44 +1,72 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import "./CartItems.css"
 import { ShopContext } from '../../Context/ShopContext'
 import remove_icon from "../Assets/cart_cross_icon.png"
 
 const CartItems = () => {
-    const {getTotalCartAmount,all_product ,CartItems,removeFromCart} = useContext(ShopContext);
+    
+    const {getTotalCartAmount,all_product ,cartItems, removeFromCart} = useContext(ShopContext);
+    const [availableCart, setAvailableCart] = useState([])
+
+    useEffect(() => {
+       setCart()
+    }, [])
+
+    const setCart = () => {
+        let cartData = []
+        all_product.forEach((product) => {
+            if (cartItems[product.id] > 0) {
+                let cart = {...product}
+                cart.quantity = cartItems[cart.id]
+                cartData.push(cart)
+            }
+        })
+        setAvailableCart(cartData)
+        // console.log("Cart", cartData)
+    }
+
+
   return (
+    
 
     <div className='cartitems'>
-        <div className='cartitems-format-main'>
-            <p>Products</p>
-            <p>Title</p>
-            <p>Price</p>
-            <p>Quantity</p>
-            <p>Total</p>
-            <p>Remove</p>
-        </div>
-<hr/>
 
-{all_product.map((e)=>{
-    if(e && CartItems && CartItems[e.id] > 0){
-        return ( <div key={e.id}>
-        <div className='cartitems-fromat cartitems-format-main'>
-            <img src={e.image} alt="" className='carticon-product-icon'/>
-            <p>{e.name}</p>
-            <p>${e.new_price}</p>
-            <button className='cartitems-quantity'>{CartItems[e.id]}</button>
-            <p>${e.new_price*CartItems[e.id]}</p>
-            <img 
-            className="cartitems-remove-icon" 
-            src={remove_icon} 
-            onClick={()=>{removeFromCart(e.id)}}
-            alt="" />
-         </div>
-         <hr/>
-        </div>
-        );
-    }
-    return null;
-})}
+        <table >
+            <thead>
+                <tr>
+                    <th>Products</th>
+                    <th>Title</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Total</th>
+                    <th>Remove</th>
+                </tr>
+            </thead>
+            <tbody>
+               {
+                 (availableCart.length > 0) ? (
+                    availableCart.map((product, index) => (
+                        <tr key={index}>
+                            <td>
+                               <img src={product.image} alt="" />
+                            </td>
+                            <td>{product.name}</td>
+                            <td>{product.new_price}</td>
+                            <td>{product.quantity}</td>
+                            <td>{product.quantity * product.new_price}</td>
+                            <td>
+                                <img src={remove_icon} alt="" />
+                            </td>
+                        </tr>
+                    ))
+                 ) : (
+                    <tr align="center">
+                        <td colSpan={6}>No Products</td>
+                    </tr>
+                 )
+               }
+            </tbody>
+        </table>
 
 <div className="cartitems-down">
     <div className="cartitems-total">
